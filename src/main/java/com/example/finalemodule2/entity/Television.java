@@ -17,6 +17,11 @@ public class Television extends Device {
         this.country = country;
     }
 
-
-
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " - "
+                + "Diagonal: " + diagonal
+                + "; Country: " + country
+                +  "; " + super.toString();
+    }
 }

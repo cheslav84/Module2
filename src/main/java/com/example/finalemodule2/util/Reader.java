@@ -14,7 +14,6 @@ public abstract class Reader {
             throw new IllegalArgumentException("Empty file name.");
         }
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
         List<Map<String, Object>> data;
         try (InputStream input = contextClassLoader.getResourceAsStream(fileName);
              BufferedReader bf = new BufferedReader(new InputStreamReader(input))) {

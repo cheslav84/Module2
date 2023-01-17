@@ -11,6 +11,7 @@ public class CSVReader extends Reader {
     protected List<Map<String, Object>> parseData(final BufferedReader bf) throws IOException {
         String line;
         List<String> csvLines = new ArrayList<>();
+
         while ((line = bf.readLine()) != null) {
             csvLines.add(line);
         }

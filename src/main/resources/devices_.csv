@@ -1,3 +1,11 @@
-type;series;model;diagonal;screen type;country;price
-Telephone;S-10;Samsung;none;QLED;none;200
-Television;RTI-14;;25;LED;China;1500
+type;model;series;diagonal;screen type;country;price
+Telephone;Samsung;Galaxy S21 FE G990B 6/128GB Gray;none;Dynamic AMOLED 2X;none;23499
+Telephone;Xiaomi;Redmi A1 2/32GB (Light Green);none;IPS;none;3699
+Telephone;Apple;iPhone 13 128GB Blue ;none;OLED;none;35999
+Telephone;OPPO;A17 4/64GB (Midnight Black);none;LCD;none;6999
+Telephone;Samsung ;Galaxy A53 2022 A536E 6/128GB Black;none;Super AMOLED;none;15999
+Television;none;Kivi 43 4K UHD Smart TV;43;SMVA;China;13679
+Television;none;Sony KD55X81KR;55;IPS;Malaysia;36999
+Television;none;Philips 48OLED707/12;48;OLED;Poland;39999
+Television;none;LG SIGNATURE 8K OLED OLED88ZX9LA;88;OLED Slovinia;;999999
+Television;none;Hitachi 55HAK5350;55;LCD;Turkey;16999

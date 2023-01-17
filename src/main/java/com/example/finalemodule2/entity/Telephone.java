@@ -14,4 +14,11 @@ public class Telephone extends Device {
         super(series, screenType, price);
         this.model = model;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " - "
+                + "Model: " + model
+                +  "; " + super.toString();
+    }
 }

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -13,21 +13,34 @@ import java.util.List;
 public class Invoice {
     private Customer customer;
     private List<Device> devices;
-    @Setter(AccessLevel.NONE)
     private Type type;
+    @Setter(AccessLevel.NONE)
+    private Date creatingDate;
 
     @Builder
-    public Invoice(Customer customer, double limit, List<Device> devices) {
+    public Invoice(Customer customer, List<Device> devices, Date creatingDate, Type type) {
         this.customer = customer;
         this.devices = devices;
-        this.type = setType(limit, devices);
+        this.creatingDate = creatingDate;
+        this.type = type;
     }
 
-    private Type setType(double limit, List<Device> devices) {
-        BigDecimal sum = devices.stream()
-                .map(device -> device.getPrice())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return (sum.compareTo(new BigDecimal(limit)) > 0) ? Type.WHOLESALE : Type.RETAIL;
+    @Override
+    public String toString() {
+        return "Invoice:" + "\n"
+                + "  Creation date: " + creatingDate + "\n"
+                + "  Customer - " + customer + "\n"
+                + "  Type: " + type.toString().toLowerCase() + "\n"
+                + "  Devices: " + toString(devices);
     }
 
+    private String toString(List<Device> devices) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        for (Device device : devices) {
+            sb.append("    ");
+            sb.append(device);
+        }
+        return sb.toString();
+    }
 }

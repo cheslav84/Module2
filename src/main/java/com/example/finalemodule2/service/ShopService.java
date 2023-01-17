@@ -1,9 +1,6 @@
 package com.example.finalemodule2.service;
 
-import com.example.finalemodule2.entity.Device;
-import com.example.finalemodule2.entity.DeviceType;
-import com.example.finalemodule2.entity.Telephone;
-import com.example.finalemodule2.entity.Television;
+import com.example.finalemodule2.entity.*;
 import com.example.finalemodule2.exception.BrokenDeviceException;
 import com.example.finalemodule2.util.FileReaderFactory;
 import com.example.finalemodule2.util.Reader;
@@ -19,7 +16,7 @@ public class ShopService {
     private static final int MAX_NUMBER_OF_DEVICES = 5;
 
 
-    public List<Device> getAllDevices (String devicesFileName, int numberOfDevices) {
+    public List<Device> getDevices(String devicesFileName, int numberOfDevices) {
         checkNumberOfDevices(numberOfDevices);
         List<Device> allDevices = getAllDevices(devicesFileName);
         return getSomeFromAllDevices(allDevices, numberOfDevices);
@@ -34,16 +31,16 @@ public class ShopService {
         return randomDeviceNumbers.values().stream().toList();
     }
 
-    public List<Device> getAllDevices (String devicesFileName) {
+    private List<Device> getAllDevices (String devicesFileName) {
         List<Device> devices = null;
         try {
             FileReaderFactory fileReaderFactory = new FileReaderFactory();
             Reader reader = fileReaderFactory.getReader(devicesFileName);
             List<Map<String, Object>> data = reader.readData(devicesFileName);
             devices = data.stream()
-                    .map(s -> {
+                    .map(d -> {
                         try {
-                            return mapDevice.apply(s);
+                            return mapDevice.apply(d);
                         } catch (BrokenDeviceException e) {
                             System.err.println(e.getMessage());
                             return null;
@@ -52,52 +49,57 @@ public class ShopService {
                     .filter(Objects::nonNull)
                     .toList();
         } catch (IOException e) {
-            System.err.println("File error or I/O error: " + e);
+            System.err.println("LOG: ERROR - File not found: " + e);
         }
         return devices;
     }
 
 
-    public Function<Map<String, Object>, Device> mapDevice = map -> {
-        checkDoesNotContainBroken(map);
-        DeviceType deviceType = DeviceType.valueOf(((String) map.get("type")).toUpperCase());
+    public Function<Map<String, Object>, Device> mapDevice = deviceMap -> {
+        checkDoesNotContainBroken(deviceMap);
         Device device;
-        if (deviceType.equals(DeviceType.TELEVISION)) {
-            device = mapTelevision(map);
-        } else if (deviceType.equals(DeviceType.TELEPHONE)) {
-            device = mapTelephone(map);
+        if (getDeviceType(deviceMap).equals(DeviceType.TELEVISION)) {
+            device = mapTelevision(deviceMap);
+        } else if (getDeviceType(deviceMap).equals(DeviceType.TELEPHONE)) {
+            device = mapTelephone(deviceMap);
         } else {
             throw new IllegalArgumentException();
         }
         return device;
     };
 
-    private void checkDoesNotContainBroken(Map<String, Object> map) {
-        map.values().stream()
+    private void checkDoesNotContainBroken(Map<String, Object> deviceMap) {
+        deviceMap.values().stream()
                 .filter(s -> ((String) s).isEmpty())
                 .findAny()
                 .ifPresent(a -> {
-                    throw new BrokenDeviceException("This device is broken: " + map);
+                    throw new BrokenDeviceException("LOG: ERROR - Device is broken and wont be displayed: " + deviceMap);
                 });
     }
 
-    private Television mapTelevision(Map<String, Object> map) {
+    private Television mapTelevision(Map<String, Object> deviceMap) {
         return Television.builder()
-                .series((String) map.get("series"))
-                .screenType((String) map.get("screen type"))
-                .price(new BigDecimal((String) map.get("price")))
-                .diagonal(Integer.parseInt((String) map.get("diagonal")))
-                .country((String) map.get("country"))
+                .deviceType(getDeviceType(deviceMap))
+                .series((String) deviceMap.get("series"))
+                .screenType((String) deviceMap.get("screen type"))
+                .price(new BigDecimal((String) deviceMap.get("price")))
+                .diagonal(Integer.parseInt((String) deviceMap.get("diagonal")))
+                .country((String) deviceMap.get("country"))
                 .build();
     }
 
-    private Telephone mapTelephone(Map<String, Object> map) {
+    private Telephone mapTelephone(Map<String, Object> deviceMap) {
         return Telephone.builder()
-                .series((String) map.get("series"))
-                .screenType((String) map.get("screen type"))
-                .price(new BigDecimal((String) map.get("price")))
-                .model((String) map.get("model"))
+                .deviceType(getDeviceType(deviceMap))
+                .series((String) deviceMap.get("series"))
+                .screenType((String) deviceMap.get("screen type"))
+                .price(new BigDecimal((String) deviceMap.get("price")))
+                .model((String) deviceMap.get("model"))
                 .build();
+    }
+
+    private DeviceType getDeviceType(Map<String, Object> deviceMap){
+        return DeviceType.valueOf(((String) deviceMap.get("type")).toUpperCase());
     }
 
     private void checkNumberOfDevices(int numberOfDevices) {
@@ -107,5 +109,7 @@ public class ShopService {
                     + MIN_NUMBER_OF_DEVICES + " to " + MAX_NUMBER_OF_DEVICES);
         }
     }
+
+
 
 }

@@ -17,4 +17,10 @@ public class Customer {
         this.email = email;
         this.age = age;
     }
+
+    @Override
+    public String toString() {
+        return "Email: " + email
+                + "; Age: " + age;
+    }
 }

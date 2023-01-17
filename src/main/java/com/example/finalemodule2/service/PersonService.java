@@ -26,7 +26,7 @@ public class PersonService {
     }
 
     private int getRandomAge() {
-            return new Random().nextInt(18, 100);
+            return new Random().nextInt(14, 80);
     }
 
 

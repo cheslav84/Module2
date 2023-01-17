@@ -1,34 +1,45 @@
 package com.example.finalemodule2.service;
 
 import com.example.finalemodule2.entity.Customer;
+import com.example.finalemodule2.entity.Device;
 import com.example.finalemodule2.entity.Invoice;
+import com.example.finalemodule2.entity.Type;
+import com.example.finalemodule2.repository.InvoiceRepository;
 
-import java.util.Random;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 public class InvoiceService {
 
-//    public Invoice getRandomCustomer () {
-//        return Customer.builder()
-//                .age(getRandomAge())
-//                .email(getRandomEmail())
-//                .build();
-//    }
-//
-//    private String getRandomEmail() {
-//        String email = "";
-//        String alphabet = "abcdefghijklmnopqrstuvwxyz";
-//        while (email.length() < 5) {
-//            int character = (int) (Math.random() * 26);
-//            email += alphabet.substring(character, character + 1);
-//            email += Integer.valueOf((int) (Math.random() * 99)).toString();
-//            email += "@mail.com";
-//        }
-//        return email;
-//    }
-//
-//    private int getRandomAge() {
-//            return new Random().nextInt(18, 100);
-//    }
+    private final InvoiceRepository invoiceRepository;
+
+    public InvoiceService(InvoiceRepository invoiceRepository) {
+        this.invoiceRepository = invoiceRepository;
+    }
+
+    public Invoice makeInvoice (Customer customer, List<Device> devices, double limit) {
+        Invoice invoice = Invoice.builder()
+                .customer(customer)
+                .devices(devices)
+                .creatingDate(new Date())
+                .type(getType(limit, devices))
+                .build();
+        invoiceRepository.saveInvoice(invoice);
+        logInvoice(invoice);
+        return invoice;
+    }
+
+    private void logInvoice(Invoice invoice) {
+        System.out.println(invoice);
+    }
+
+    private Type getType(double limit, List<Device> devices) {
+        BigDecimal sum = devices.stream()
+                .map(Device::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return (sum.compareTo(new BigDecimal(limit)) > 0) ? Type.WHOLESALE : Type.RETAIL;
+    }
 
 
 }

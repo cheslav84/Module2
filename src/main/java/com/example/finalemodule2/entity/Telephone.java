@@ -1,11 +1,13 @@
 package com.example.finalemodule2.entity;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class Telephone extends Device {
     private final String model;
 
@@ -21,4 +23,5 @@ public class Telephone extends Device {
                 + "Model: " + model
                 +  "; " + super.toString();
     }
+
 }

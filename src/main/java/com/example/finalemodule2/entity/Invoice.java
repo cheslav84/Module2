@@ -1,15 +1,13 @@
 package com.example.finalemodule2.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
+//@EqualsAndHashCode
 public class Invoice {
     private Customer customer;
     private List<Device> devices;
@@ -42,5 +40,25 @@ public class Invoice {
             sb.append(device);
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Invoice invoice = (Invoice) o;
+        if (customer != null ? !customer.equals(invoice.customer) : invoice.customer != null) return false;
+        if (devices != null ? !devices.equals(invoice.devices) : invoice.devices != null) return false;
+        if (type != invoice.type) return false;
+        return creatingDate != null ? creatingDate.toString().equals(invoice.creatingDate.toString()) : invoice.creatingDate == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = customer != null ? customer.hashCode() : 0;
+        result = 31 * result + (devices != null ? devices.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (creatingDate != null ? creatingDate.hashCode() : 0);
+        return result;
     }
 }

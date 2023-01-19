@@ -19,15 +19,22 @@ public class InvoiceService {
     }
 
     public Invoice makeInvoice (Customer customer, List<Device> devices, double limit) {
-        Invoice invoice = Invoice.builder()
-                .customer(customer)
-                .devices(devices)
-                .creatingDate(new Date())
-                .type(getType(limit, devices))
-                .build();
+        checkData(customer, limit);
+            Invoice invoice = Invoice.builder()
+                    .customer(customer)
+                    .devices(devices)
+                    .creatingDate(new Date())
+                    .type(getType(limit, devices))
+                    .build();
         invoiceRepository.saveInvoice(invoice);
         logInvoice(invoice);
         return invoice;
+    }
+
+    private void checkData(Customer customer, double limit) {
+        if (customer == null || limit <= 0) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private void logInvoice(Invoice invoice) {
@@ -40,6 +47,7 @@ public class InvoiceService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return (sum.compareTo(new BigDecimal(limit)) > 0) ? Type.WHOLESALE : Type.RETAIL;
     }
+
 
 
 }

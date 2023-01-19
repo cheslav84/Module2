@@ -13,14 +13,13 @@ import java.util.Random;
 public class InvoiceEmulator {
 
 
-    public static void emulateInvoices(int amount, String devicesFileName, double limit) {
-        ShopService shopService = new ShopService();
+    public static void emulateInvoices(ShopService shopService, int amount, double limit) {
         PersonService personService = new PersonService();
         InvoiceService invoiceService = new InvoiceService(InvoiceRepository.getInstance());
 
         for (int i = 0; i < amount; i++) {
             List<Device> devices = shopService.
-                    getDevices(devicesFileName, new Random().nextInt(1, 5));
+                    getDevices(new Random().nextInt(1, 5));
             Customer customer = personService.getRandomCustomer();
             invoiceService.makeInvoice(customer, devices, limit);
 

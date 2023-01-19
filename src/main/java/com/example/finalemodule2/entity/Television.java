@@ -1,11 +1,13 @@
 package com.example.finalemodule2.entity;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class Television extends Device {
     private final int diagonal;
     private final String country;

@@ -4,12 +4,13 @@ import lombok.*;
 
 @Getter
 @ToString
+@EqualsAndHashCode(exclude = {"id"})
 public class Customer {
     @Getter(AccessLevel.NONE)
     private static long count = 0;
     private long id = 0;
     private String email;
-    int age;
+    private int age;
 
     @Builder
     public Customer(String email, int age) {

@@ -1,12 +1,14 @@
 package com.example.finalemodule2.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Device {
     private final DeviceType deviceType;
     private final String series;

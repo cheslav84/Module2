@@ -11,14 +11,21 @@ import java.util.*;
 import java.util.function.Function;
 
 public class ShopService {
-
     private static final int MIN_NUMBER_OF_DEVICES = 1;
     private static final int MAX_NUMBER_OF_DEVICES = 5;
+    private static FileReaderFactory fileReaderFactory;
+    private Reader reader;
+    private String devicesFileName;
 
+    public ShopService(String devicesFileName) {
+        this.devicesFileName = devicesFileName;
+        fileReaderFactory = new FileReaderFactory();
+        reader = fileReaderFactory.getReader(devicesFileName);
+    }
 
-    public List<Device> getDevices(String devicesFileName, int numberOfDevices) {
+    public List<Device> getDevices(int numberOfDevices) {
         checkNumberOfDevices(numberOfDevices);
-        List<Device> allDevices = getAllDevices(devicesFileName);
+        List<Device> allDevices = getAllDevices();
         return getSomeFromAllDevices(allDevices, numberOfDevices);
     }
 
@@ -31,11 +38,9 @@ public class ShopService {
         return randomDeviceNumbers.values().stream().toList();
     }
 
-    private List<Device> getAllDevices (String devicesFileName) {
+    List<Device> getAllDevices() {
         List<Device> devices = null;
         try {
-            FileReaderFactory fileReaderFactory = new FileReaderFactory();
-            Reader reader = fileReaderFactory.getReader(devicesFileName);
             List<Map<String, Object>> data = reader.readData(devicesFileName);
             devices = data.stream()
                     .map(d -> {
@@ -53,7 +58,6 @@ public class ShopService {
         }
         return devices;
     }
-
 
     public Function<Map<String, Object>, Device> mapDevice = deviceMap -> {
         checkDoesNotContainBroken(deviceMap);
@@ -109,7 +113,5 @@ public class ShopService {
                     + MIN_NUMBER_OF_DEVICES + " to " + MAX_NUMBER_OF_DEVICES);
         }
     }
-
-
 
 }

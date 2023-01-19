@@ -7,6 +7,7 @@ import com.example.finalemodule2.util.comparators.invoice.InvoiceUserAgeComparat
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class InvoiceRepository {
@@ -82,13 +83,13 @@ public class InvoiceRepository {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public long amountOfRetailInvoices(){
+    public long getAmountOfRetailInvoices(){
         return invoices.stream()
                 .filter(invoice -> invoice.getType().equals(Type.RETAIL))
                 .count();
     }
 
-    public List<Invoice> oneTypeDeviceInvoices(){
+    public List<Invoice> getOneTypeDeviceInvoices(){
         return invoices.stream()
                 .filter(devices -> 1 == devices.getDevices().stream()
                         .map(Device::getDeviceType)

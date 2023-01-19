@@ -51,8 +51,8 @@ public class Main {
         System.out.println("The the customers with " + customerWithLowestPrice + " made the ");
 
         System.out.println("Sum of all orders: " + repository.getSumOfAllOrders() + " UAH.");
-        System.out.println("Amount of retail invoices: " + repository.amountOfRetailInvoices());
-        System.out.println("\n Invoices that have one type of device: " + repository.oneTypeDeviceInvoices() + "\n");
+        System.out.println("Amount of retail invoices: " + repository.getAmountOfRetailInvoices());
+        System.out.println("\n Invoices that have one type of device: " + repository.getOneTypeDeviceInvoices() + "\n");
         System.out.println("\n First three invoices in repository: " + repository.getFirstThreeInvoices() + "\n");
 
         int customerAge = 18;
@@ -64,9 +64,8 @@ public class Main {
 
     private static Customer getCustomer(Map<Customer, BigDecimal> theLowestPriceAndUser){
         Iterator<Customer> iterator = theLowestPriceAndUser.keySet().iterator();
-        Customer key = null;
         if(iterator.hasNext()){
-            return key = iterator.next();
+            return iterator.next();
         }
         throw new IllegalArgumentException("The lowest price can't be obtained.");
     }

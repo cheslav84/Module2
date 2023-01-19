@@ -31,6 +31,12 @@ public class InvoiceService {
         return invoice;
     }
 
+    public BigDecimal getTotalPrice(Invoice invoice) {
+        return invoice.getDevices().stream()
+                .map(Device::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     private void checkData(Customer customer, double limit) {
         if (customer == null || limit <= 0) {
             throw new IllegalArgumentException();

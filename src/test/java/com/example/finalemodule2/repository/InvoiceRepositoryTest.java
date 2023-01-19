@@ -1,10 +1,12 @@
 package com.example.finalemodule2.repository;
 
 import com.example.finalemodule2.entity.*;
+import com.example.finalemodule2.service.InvoiceService;
 import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,9 +33,9 @@ class InvoiceRepositoryTest {
 
     @Test
     void amountOfSoldDevices() {
-        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVs());
-        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTV());
-        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTV());
+        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVsRetail());
+        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTVRetailAgeFifty());
+        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTVWholesaleAgeFifty());
         long telephonesAmount = repo.getAmountOfSoldDevices(DeviceType.TELEPHONE);
         long televisionsAmount = repo.getAmountOfSoldDevices(DeviceType.TELEVISION);
         assertEquals(5, telephonesAmount);
@@ -42,9 +44,9 @@ class InvoiceRepositoryTest {
 
     @Test
     void getUserWithLowestInvoice() {
-        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVs());
+        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVsRetail());
         repo.saveInvoice(getInvoiceFirstAddedOneDeviseWithLowerPrice());
-        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTV());
+        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTVRetailAgeFifty());
         Map<Customer, BigDecimal> theLowestPriceAndUser = repo.getUserWithLowestInvoice();
         Customer customerWithLowestPrice = getCustomer(theLowestPriceAndUser);
         BigDecimal lowestOrderPriceInv = theLowestPriceAndUser.get(customerWithLowestPrice);
@@ -53,25 +55,48 @@ class InvoiceRepositoryTest {
                 .get(0)
                 .getPrice();
         assertEquals(expectedPrice, lowestOrderPriceInv);
-        assertEquals(getCustomerWithAgeUnderEighteenLowerInvoice(), customerWithLowestPrice);
+        assertEquals(getCustomerWithAgeEighteen(), customerWithLowestPrice);
     }
 
     @Test
     void sumOfAllOrders() {
-        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVs());
-        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTV());
-        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTV());
+        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVsRetail());
+        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTVRetailAgeFifty());
+        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTVWholesaleAgeFifty());
         BigDecimal sumAllOrders = repo.getSumOfAllOrders();
         assertEquals(new BigDecimal(204130), sumAllOrders);
     }
 
     @Test
     void amountOfRetailInvoices() {
-
+        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVsRetail());
+        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTVRetailAgeFifty());
+        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTVWholesaleAgeFifty());
+        long amountRetailInvoices = repo.getAmountOfRetailInvoices();
+        assertEquals(2, amountRetailInvoices);
     }
 
     @Test
-    void oneTypeDeviceInvoices() {
+    void amountOfRetailInvoicesZero() {
+        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTVWholesaleAgeFifty());
+        long amountRetailInvoices = repo.getAmountOfRetailInvoices();
+        assertEquals(0, amountRetailInvoices);
+    }
+
+    @Test
+    void oneTypeDeviceInvoicesTrue() {
+        repo.saveInvoice(getInvoiceFirstAddedOneDeviseWithLowerPrice());
+        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVsRetail());
+        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTVRetailAgeFifty());
+        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTVWholesaleAgeFifty());
+        repo.saveInvoice(getInvoiceDevicesOneType());
+        List<Invoice> oneTypeDevices = repo.getOneTypeDeviceInvoices();
+        Predicate<List<Device>> p = d -> d.stream().allMatch(s -> s.getDeviceType().equals(DeviceType.TELEPHONE));
+        Predicate<List<Device>> t = d -> d.stream().allMatch(s -> s.getDeviceType().equals(DeviceType.TELEVISION));
+        boolean isOneType = oneTypeDevices.stream()
+                .map(Invoice::getDevices)
+                .allMatch(p.or(t));
+        assertTrue(isOneType);
     }
 
     @Test
@@ -79,7 +104,7 @@ class InvoiceRepositoryTest {
         repo.saveInvoice(getInvoiceFirstAddedOneDeviseWithLowerPrice());
         repo.saveInvoice(getInvoiceSecondAddedTwoDevicesUnderEighteen());
         repo.saveInvoice(getInvoiceThirdAddedThreeDevicesUnderEighteen());
-        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVs());
+        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVsRetail());
         List<Invoice> invoices = repo.getFirstThreeInvoices();
         assertEquals(getInvoiceFirstAddedOneDeviseWithLowerPrice(), invoices.get(0));
         assertEquals(getInvoiceSecondAddedTwoDevicesUnderEighteen(), invoices.get(1));
@@ -88,31 +113,48 @@ class InvoiceRepositoryTest {
 
     @Test
     void invoicesWithUserAgeLessThan() {
+        repo.saveInvoice(getInvoiceFirstAddedOneDeviseWithLowerPrice());
+        repo.saveInvoice(getInvoiceSecondAddedTwoDevicesUnderEighteen());
+        repo.saveInvoice(getInvoiceThirdAddedThreeDevicesUnderEighteen());
+        repo.saveInvoice(getInvoiceFourDevicesTwoPhonesTwoTVsRetail());
+        int ageOfCustomer = 18;
+        List<Invoice> invoices = repo.invoicesWithUserAgeLessThan(ageOfCustomer);
+        assertEquals(getCustomerWithAgeUnderEighteenLowerInvoice(), invoices.get(0).getCustomer());
+        assertEquals(getCustomerWithAgeUnderEighteenLowerInvoice(), invoices.get(1).getCustomer());
+        assertEquals(Type.LOW_AGE, invoices.get(0).getType());
+        assertEquals(Type.LOW_AGE, invoices.get(1).getType());
+        assertEquals(2, invoices.size());
     }
 
     @Test
     void sortInvoices() {
+        InvoiceService service = new InvoiceService(repo);
+        repo.saveInvoice(getInvoiceFirstAddedOneDeviseWithLowerPrice());
+        repo.saveInvoice(getInvoiceSecondAddedTwoDevicesUnderEighteen());
+        repo.saveInvoice(getInvoiceThirdAddedThreeDevicesUnderEighteen());
+        repo.saveInvoice(getInvoiceThreeDevicesOnePhoneThoTVRetailAgeFifty());
+        repo.saveInvoice(getInvoiceThreeDevicesTwoPhonesOneTVWholesaleAgeFifty());
+        List<Invoice> invoices = repo.sortInvoices();
+
+        assertTrue(invoices.get(0).getCustomer().getAge() >= invoices.get(1).getCustomer().getAge());
+        assertTrue(invoices.get(1).getCustomer().getAge() >= invoices.get(2).getCustomer().getAge());
+        assertTrue(invoices.get(2).getCustomer().getAge() >= invoices.get(3).getCustomer().getAge());
+        assertTrue(invoices.get(3).getCustomer().getAge() >= invoices.get(4).getCustomer().getAge());
+
+        assertTrue(invoices.get(0).getDevices().size() >= invoices.get(1).getDevices().size());
+        assertTrue(invoices.get(1).getDevices().size() >= invoices.get(2).getDevices().size());
+        assertTrue(invoices.get(3).getDevices().size() >= invoices.get(4).getDevices().size());
+
+        assertTrue(service.getTotalPrice(invoices.get(1)).compareTo(service.getTotalPrice(invoices.get(2))) >=0 );
+        assertTrue(service.getTotalPrice(invoices.get(3)).compareTo(service.getTotalPrice(invoices.get(4))) >=0 );
     }
-//
-//    private Invoice getInvoiceForTest(){
-//        return Invoice.builder()
-//                .customer(getCustomerForTest())
-//                .devices(devices)
-//                .creatingDate(new Date())
-//                .type(getType(limit, devices))
-//                .build();
-//    }
-//
-//    private getCustomerForTest() {
-//        return
-//    }
 
 
 
 
     private Invoice getInvoiceFirstAddedOneDeviseWithLowerPrice() {
         return Invoice.builder()
-                .customer(getCustomerWithAgeUnderEighteenLowerInvoice())
+                .customer(getCustomerWithAgeEighteen())
                 .devices(getDevicesOneDeviceAndLowerPrice())
                 .creatingDate(new Date())
                 .type(Type.RETAIL)
@@ -121,7 +163,7 @@ class InvoiceRepositoryTest {
 
     private Invoice getInvoiceSecondAddedTwoDevicesUnderEighteen() {
         return Invoice.builder()
-                .customer(getCustomerWithAgeEighteen())
+                .customer(getCustomerWithAgeUnderEighteenLowerInvoice())
                 .devices(getTwoDevices())
                 .creatingDate(new Date())
                 .type(Type.RETAIL)
@@ -137,41 +179,42 @@ class InvoiceRepositoryTest {
                 .build();
     }
 
-//    private Invoice getInvoiceFourDevices() {
-//        return Invoice.builder()
-//                .customer(getCustomerWithAgeFifty())
-//                .devices(getFourDevices())
-//                .creatingDate(new Date())
-//                .type(Type.RETAIL)
-//                .build();
-//    }
-
-
-    private Invoice getInvoiceFourDevicesTwoPhonesTwoTVs() {
+    private Invoice getInvoiceFourDevicesTwoPhonesTwoTVsRetail() {
         return Invoice.builder()
-                .customer(getCustomerWithAgeUnderEighteenLowerInvoice())
+                .customer(getCustomerWithAgeEighteen())
                 .devices(getFourDevicesTwoPhonesTwoTVs())
                 .creatingDate(new Date())
                 .type(Type.RETAIL)
                 .build();
     }
 
-    private Invoice getInvoiceThreeDevicesOnePhoneThoTV() {
+    private Invoice getInvoiceThreeDevicesOnePhoneThoTVRetailAgeFifty() {
         return Invoice.builder()
-                .customer(getCustomerWithAgeEighteen())
+                .customer(getCustomerWithAgeFifty())
                 .devices(getThreeDevicesOnePhoneTwoTV())
                 .creatingDate(new Date())
                 .type(Type.RETAIL)
                 .build();
     }
-    private Invoice getInvoiceThreeDevicesTwoPhonesOneTV() {
+    private Invoice getInvoiceThreeDevicesTwoPhonesOneTVWholesaleAgeFifty() {
         return Invoice.builder()
-                .customer(getCustomerWithAgeEighteen())
+                .customer(getCustomerWithAgeFifty())
                 .devices(getThreeDevicesTwoPhonesOneTV())
                 .creatingDate(new Date())
-                .type(Type.RETAIL)
+                .type(Type.WHOLESALE)
                 .build();
     }
+
+    private Invoice getInvoiceDevicesOneType() {
+        return Invoice.builder()
+                .customer(getCustomerWithAgeEighteen())
+                .devices(getDevicesOneType())
+                .creatingDate(new Date())
+                .type(Type.WHOLESALE)
+                .build();
+    }
+
+
 
     private List<Device> getDevicesOneDeviceAndLowerPrice() {
         List<Device> devices = new ArrayList<>();
@@ -284,9 +327,8 @@ class InvoiceRepositoryTest {
 
     private static Customer getCustomer(Map<Customer, BigDecimal> theLowestPriceAndUser){
         Iterator<Customer> iterator = theLowestPriceAndUser.keySet().iterator();
-        Customer key = null;
         if(iterator.hasNext()){
-            return key = iterator.next();
+            return iterator.next();
         }
         throw new IllegalArgumentException("The lowest price can't be obtained.");
     }

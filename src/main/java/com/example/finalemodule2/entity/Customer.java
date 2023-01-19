@@ -3,14 +3,13 @@ package com.example.finalemodule2.entity;
 import lombok.*;
 
 @Getter
-@ToString
 @EqualsAndHashCode(exclude = {"id"})
 public class Customer {
     @Getter(AccessLevel.NONE)
-    private static long count = 0;
-    private long id = 0;
-    private String email;
-    private int age;
+    private static long count;
+    private final long id;
+    private final String email;
+    private final int age;
 
     @Builder
     public Customer(String email, int age) {

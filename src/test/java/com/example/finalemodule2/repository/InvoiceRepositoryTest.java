@@ -327,8 +327,9 @@ class InvoiceRepositoryTest {
 
     private static Customer getCustomer(Map<Customer, BigDecimal> theLowestPriceAndUser){
         Iterator<Customer> iterator = theLowestPriceAndUser.keySet().iterator();
+        Customer key = null;
         if(iterator.hasNext()){
-            return iterator.next();
+            return key = iterator.next();
         }
         throw new IllegalArgumentException("The lowest price can't be obtained.");
     }

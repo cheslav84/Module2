@@ -14,15 +14,15 @@ public class PersonService {
     }
 
     private String getRandomEmail() {
-        String email = "";
+        StringBuilder email = new StringBuilder();
         String alphabet = "abcdefghijklmnopqrstuvwxyz";
         while (email.length() < 5) {
             int character = (int) (Math.random() * 26);
-            email += alphabet.substring(character, character + 1);
-            email += Integer.valueOf((int) (Math.random() * 99)).toString();
-            email += "@mail.com";
+            email.append(alphabet.charAt(character));
+            email.append(Integer.valueOf((int) (Math.random() * 99)).toString());
+            email.append("@mail.com");
         }
-        return email;
+        return email.toString();
     }
 
     private int getRandomAge() {

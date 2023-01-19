@@ -7,7 +7,6 @@ import com.example.finalemodule2.util.comparators.invoice.InvoiceUserAgeComparat
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class InvoiceRepository {
